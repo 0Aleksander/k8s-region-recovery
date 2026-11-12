@@ -14,10 +14,12 @@ nameOverride: ""
 image:
   # Registry + repository prefix shared by all four built services; each
   # service appends its own name (e.g. ghcr.io/platformfix/k8coins-rng).
+  # This repo doesn't change the app code, so it uses the upstream k8coins
+  # images (public on GHCR, checked with an anonymous pull on 2026-11-12).
   registry: ghcr.io/platformfix
-  # Defaults to Chart.AppVersion when empty - set on --install/--upgrade by
-  # the release workflow, or override explicitly for a dev build.
-  tag: ""
+  # Pinned to one upstream release so every recovery run deploys exactly the
+  # same images. Empty would fall back to Chart.AppVersion (a placeholder here).
+  tag: "v0.5.17"
   pullPolicy: IfNotPresent
 
 # Per-service settings for the four built services. rng and hasher have no
