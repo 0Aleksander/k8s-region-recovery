@@ -1,0 +1,9 @@
+k8s-region-recovery
+Copyright 2026 Aleksander Laketa
+
+Based on k8coins by Steve Wade / Platform Fix
+https://github.com/platformfix/k8coins (Apache License 2.0)
+
+k8coins is adapted from DockerCoins by Jérôme Petazzoni
+https://github.com/jpetazzo/container.training
+git commit -am "docs: move NOTICE to repo root with proper credits"

@@ -1,1 +1,0 @@
-credit jpetazzo (DockerCoins) and Steve Wade / Platform Fix (k8coins)
