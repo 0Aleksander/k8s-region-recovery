@@ -3,6 +3,6 @@ node_modules/
 *.log
 
 *.tfstate*
- *.tfvars
+*.tfvars
 .terraform/
- kubeconfig*
+kubeconfig*
