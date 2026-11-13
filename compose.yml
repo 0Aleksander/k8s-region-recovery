@@ -25,7 +25,9 @@ services:
 
   redis:
     image: redis:7-alpine
-    command: ["sh", "-c", "exec redis-server --requirepass \"$$REDIS_PASSWORD\""]
+    volumes:
+      - redis-data:/data
+    command: ["sh", "-c", "exec redis-server --requirepass \"$$REDIS_PASSWORD\" --appendonly yes "]
     environment:
       <<: *redis-password
 
@@ -33,3 +35,6 @@ services:
     build: worker
     environment:
       <<: *redis-password
+
+volumes:
+  redis-data:
