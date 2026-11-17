@@ -8,6 +8,10 @@ metadata:
     {{- include "k8coins.selectorLabels" $ctx | nindent 4 }}
 spec:
   replicas: 1
+  {{- if .Values.redis.persistence.enabled }}
+  strategy:
+    type: Recreate
+  {{- end }}
   selector:
     matchLabels:
       {{- include "k8coins.selectorLabels" $ctx | nindent 6 }}
@@ -27,7 +31,7 @@ spec:
           command:
             - sh
             - -c
-            - exec redis-server --requirepass "$REDIS_PASSWORD"
+            - exec redis-server --requirepass "$REDIS_PASSWORD"{{ if .Values.redis.persistence.enabled }} --appendonly yes{{ end }}
           env:
             - name: REDIS_PASSWORD
               valueFrom:
@@ -40,6 +44,17 @@ spec:
               protocol: TCP
           resources:
             {{- toYaml .Values.redis.resources | nindent 12 }}
+          {{- if .Values.redis.persistence.enabled }}
+          volumeMounts:
+            - name: data
+              mountPath: /data
+          {{- end }}
+      {{- if .Values.redis.persistence.enabled }}
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: redis-data
+      {{- end }}
 ---
 apiVersion: v1
 kind: Service
