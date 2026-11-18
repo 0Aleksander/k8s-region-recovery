@@ -114,6 +114,16 @@ redis:
     limits:
       cpu: 200m
       memory: 128Mi
+  # Off by default, so existing installs don't suddenly ask the cluster
+  # for a disk it might not have.
+  persistence:
+    enabled: false
+    # The data is a counter plus a few hundred hashes (measured in the
+    # Compose wipe test), so 1Gi is plenty.
+    size: 1Gi
+    # Empty = use the cluster's default disk type. Set a name to pick a
+    # specific one (e.g. a different disk in region B).
+    storageClass: ""
 
 # webui is the only service with a browser-facing UI (the mining-rate
 # dashboard) - it's the only one this chart ever puts behind an Ingress.
