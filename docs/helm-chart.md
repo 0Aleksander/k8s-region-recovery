@@ -15,9 +15,31 @@ configurable: per-service resource requests/limits, autoscaling (off by
 default), and an optional Ingress for `webui` (also off; for local access use
 `kubectl port-forward svc/webui 8000:80`).
 
-Redis currently has **no persistence** (no volume, no RDB/AOF), and its
-password is generated fresh on every install. Both are being changed for the
-recovery experiment, see [`CHALLENGES.md`](../CHALLENGES.md).
+## Redis persistence (optional)
+
+Off by default, so existing installs don't change. Turn it on with:
+
+```bash
+helm install k8coins ./chart/k8coins --set redis.persistence.enabled=true
+```
+
+| Value | Default | What |
+|---|---|---|
+| `redis.persistence.enabled` | `false` | Create a PVC (`redis-data`) and mount it at `/data` |
+| `redis.persistence.size` | `1Gi` | The data is a counter plus a few thousand hashes, and cloud disks round up to ~1Gi anyway |
+| `redis.persistence.storageClass` | `""` | Empty = the line is left out, so the cluster's default class is used. Set a name to pick a disk type |
+
+With persistence on, Redis runs with AOF (`--appendonly yes`) and the Deployment
+uses `strategy: Recreate`: the disk is `ReadWriteOnce` (one node at a time), so
+the old pod must stop before the new one can attach it. The cost is a few
+seconds without Redis during an update. Why not `ReadWriteMany`: see
+[`CHALLENGES.md`](../CHALLENGES.md).
+
+Tested on a one-node k3s (18 Nov): data kept across a `rollout restart`. On one
+node the RWO conflict can't show up, so the real check is a multi-node cluster.
+
+The Redis password is generated on install. It's a setting, not data (it isn't
+stored in the AOF), so restored data works with a new password.
 
 `rng`, `hasher`, `worker` and `webui` reach each other and `redis` by fixed
 Service names hardcoded in each service's source code, so the chart's Service
